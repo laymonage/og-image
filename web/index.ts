@@ -91,7 +91,7 @@ interface FieldProps {
 const Field = ({ label, input }: FieldProps) => {
     return H('div',
         { className: 'field' },
-        H('label', 
+        H('label',
             H('div', {className: 'field-label'}, label),
             H('div', { className: 'field-value' }, input),
         ),
@@ -141,19 +141,6 @@ const markdownOptions: DropdownOption[] = [
     { text: 'Markdown', value: '1' },
 ];
 
-const imageLightOptions: DropdownOption[] = [
-    { text: 'Vercel', value: 'https://assets.vercel.com/image/upload/front/assets/design/vercel-triangle-black.svg' },
-    { text: 'Next.js', value: 'https://assets.vercel.com/image/upload/front/assets/design/nextjs-black-logo.svg' },
-    { text: 'Hyper', value: 'https://assets.vercel.com/image/upload/front/assets/design/hyper-color-logo.svg' },
-];
-
-const imageDarkOptions: DropdownOption[] = [
-
-    { text: 'Vercel', value: 'https://assets.vercel.com/image/upload/front/assets/design/vercel-triangle-white.svg' },
-    { text: 'Next.js', value: 'https://assets.vercel.com/image/upload/front/assets/design/nextjs-white-logo.svg' },
-    { text: 'Hyper', value: 'https://assets.vercel.com/image/upload/front/assets/design/hyper-bw-logo.svg' },
-];
-
 const widthOptions = [
     { text: 'width', value: 'auto' },
     { text: '50', value: '50' },
@@ -180,7 +167,6 @@ interface AppState extends ParsedRequest {
     loading: boolean;
     showToast: boolean;
     messageToast: string;
-    selectedImageIndex: number;
     widths: string[];
     heights: string[];
     overrideUrl: URL | null;
@@ -206,17 +192,15 @@ const App = (_: any, state: AppState, setState: SetState) => {
         theme = 'light',
         md = true,
         text = '**Hello** World',
-        images=[imageLightOptions[0].value],
+        images=[],
         widths=[],
         heights=[],
         showToast = false,
         messageToast = '',
         loading = true,
-        selectedImageIndex = 0,
         overrideUrl = null,
     } = state;
     const mdValue = md ? '1' : '0';
-    const imageOptions = theme === 'light' ? imageLightOptions : imageDarkOptions;
     const url = new URL(window.location.origin);
     url.pathname = `${encodeURIComponent(text)}.${fileType}`;
     url.searchParams.append('theme', theme);
@@ -243,9 +227,7 @@ const App = (_: any, state: AppState, setState: SetState) => {
                         options: themeOptions,
                         value: theme,
                         onchange: (val: Theme) => {
-                            const options = val === 'light' ? imageLightOptions : imageDarkOptions
                             let clone = [...images];
-                            clone[0] = options[selectedImageIndex].value;
                             setLoadingState({ theme: val, images: clone });
                         }
                     })
@@ -283,44 +265,6 @@ const App = (_: any, state: AppState, setState: SetState) => {
                             setLoadingState({ text: val, overrideUrl: url });
                         }
                     })
-                }),
-                H(Field, {
-                    label: 'Image 1',
-                    input: H('div',
-                        H(Dropdown, {
-                            options: imageOptions,
-                            value: imageOptions[selectedImageIndex].value,
-                            onchange: (val: string) =>  {
-                                let clone = [...images];
-                                clone[0] = val;
-                                const selected = imageOptions.map(o => o.value).indexOf(val);
-                                setLoadingState({ images: clone, selectedImageIndex: selected });
-                            }
-                        }),
-                        H('div',
-                            { className: 'field-flex' },
-                            H(Dropdown, {
-                                options: widthOptions,
-                                value: widths[0],
-                                small: true,
-                                onchange: (val: string) =>  {
-                                    let clone = [...widths];
-                                    clone[0] = val;
-                                    setLoadingState({ widths: clone });
-                                }
-                            }),
-                            H(Dropdown, {
-                                options: heightOptions,
-                                value: heights[0],
-                                small: true,
-                                onchange: (val: string) =>  {
-                                    let clone = [...heights];
-                                    clone[0] = val;
-                                    setLoadingState({ heights: clone });
-                                }
-                            })
-                        )
-                    ),
                 }),
                 ...images.slice(1).map((image, i) => H(Field, {
                     label: `Image ${i + 2}`,
