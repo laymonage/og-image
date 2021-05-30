@@ -43,7 +43,7 @@ function getCss(theme: string, fontSize: string) {
 
     body {
         background: ${background};
-        background-image: url('https://laymonage.com/bg.svg');
+        background-image: url('https://og-image.laymonage.com/bg.svg');
         height: 100vh;
         display: flex;
         text-align: center;
